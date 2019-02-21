@@ -1,0 +1,24 @@
+## This file explains how to process an AWPE simulation set in terms of: 
+##   Number of years (5 = all 5 years; 2 = years 1 & 4; 3 = years 1, 3, and 5)
+##   Number of sites (1, 4, 10 or 18)
+##   Number of surveys to each site per year (1, 2, or 3)
+##   Or altering any of the above based on transect definitions
+##   Output: tables with the values of diffR and estR by year, and by site and year
+##   Processing file: processSimulations.R
+ProjectId: AWPEsurveyDesign
+SimulationName: AWPE_T6T2years1visits2weeks18sites #A code to identify this data simulation definition
+DefinitionAuthor: Nadav Nur
+SimulationsFile: //prbo.org/Data/Home/Petaluma/lsalas/Documents/lsalas/IandMR8/AWPE/simulations/1000sim_1visit.RData
+Transects:        #can specify as many as desired, assuming each specification is different from all others in terms of number of surveys in 5 yrs, and/or number of visits per survey
+   -
+      TransectId: T1 	#standart
+      NumSites: 9  #The number of sites to include in this transect. If fewer than the max in the simulation, the first N (value provided here) will be used. All other transect definitions use the remaining sites if any available
+      NumYears: 6 #The number of years to include in the analysis - valid: 2, 3, 5, or 6
+      NumVisitsAdultSurveys: 1    #The number of visits to an adults survey site in a year. Valid values: [1, 3], 2. Values 1 or 3 can be used with simulation files where 3 visits were simulated. Value 2 can only be used for files where 2 visits were simulated.
+      NumVisitsJuvenileSurveys: 1    #The number of visits to a juveniles survey site in a year. Same restrictions as with adults survey sites.
+   -
+      TransectId: T2   #standart
+      NumSites: 9  #The number of sites to include in this transect. If fewer than the max in the simulation, the first N (value provided here) will be used. All other transect definitions use the remaining sites if any available
+      NumYears: 2 #The number of years to include in the analysis - valid: 2, 3, 5, or 6
+      NumVisitsAdultSurveys: 1    #The number of visits to an adults survey site in a year. Valid values: [1, 3], 2. Values 1 or 3 can be used with simulation files where 3 visits were simulated. Value 2 can only be used for files where 2 visits were simulated.
+      NumVisitsJuvenileSurveys: 1    #The number of visits to a juveniles survey site in a year. Same restrictions as with adults survey sites.

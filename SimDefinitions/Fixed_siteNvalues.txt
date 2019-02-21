@@ -1,0 +1,9 @@
+ATTENTION:
+
+We did not use the population mean to subsample area, transect, and then site means. Instead,
+we fixed the site means by sampling only once from the population mean and using the same starting site means throughout.
+We sampled from a population with mean 5.5, and using SD = 1.25
+
+We used the following sample for 18 sites:
+5.394, 4.832, 6.997, 3.774, 7.218, 4.981, 6.949, 6.065, 7.053, 4.96, 5.559, 5.635, 5.903, 6.475, 3.729, 5.079, 4.47, 3.78
+These are the stating site means, and they remain constant, since trend is 0.
