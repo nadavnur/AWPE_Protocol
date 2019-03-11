@@ -1,0 +1,40 @@
+## See HowTo_specify_a_simulation_forN.yaml for details
+ProjectId: AWPEsurveyDesign
+SimulationName: N_1visit 
+DefinitionAuthor: Nadav Nur
+NumPopulations: 1   
+Yearspan: 5       
+SamplingDist: Gaussian 
+ResponseIsLog: TRUE  
+FixSiteEffects: TRUE 
+Populations:        
+   -
+      PopulationId: Pop1 	
+      MuTrend: -0      
+      SigTrend: 0   
+      SigProcess: 0.25  
+      MuAreas: 5.5 
+      SigAreas: 0   
+      MaxMuAreas: 9.4 
+      MinMuAreas: 3 
+      Cseason: -0.0006809  
+      SeasonStart: -39 
+      SeasonEnd: 21    
+      Areas:
+         -
+             AreaId: A	
+             NumOfAreaType: 1 
+             SigTransect: 0 
+             Transects:
+                -
+                   TransectTypeId: Basic  
+                   NumOfTransectType: 1  
+                   NumSites: 18  
+                   SigSites: 1.25 
+                   Skip: 0 
+                   MinReplicates: 1 
+                   MaxReplicates: 1 
+                   ReplicateSpan: 1   
+                   ProbDetection: 1 
+                   SigSample: 0.2827  
+                   FixedSiteMeans: [5.394, 4.832, 6.997, 3.774, 7.218, 4.981, 6.949, 6.065, 7.053, 4.96, 5.559, 5.635, 5.903, 6.475, 3.729, 5.079, 4.47, 3.78]  

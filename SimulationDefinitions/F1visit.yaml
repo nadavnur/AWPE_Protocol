@@ -1,0 +1,19 @@
+## See HowTo_specify_a_simulation_forF.yaml for details
+ProjectId: AWPEsurveyDesign
+SimulationName: F_1visit 
+DefinitionAuthor: Nadav Nur
+NsurveyDesignFile: AWPE/N3visits2weeks.yaml
+R_SamplingDist: Gaussian 
+Rmu: 0.48
+Rsd: 0.12
+FixSiteEffects: FALSE 
+Populations:        
+   -
+      PopulationId: F_Pop1 	
+      Cseason: -0.0010944  
+      SeasonStart: -26 
+      SeasonEnd: 28    
+      MaxReplicates: 1 
+      ReplicateSpan: 1  
+      ProbDetection: 1 
+      SigSample: 0.3515  

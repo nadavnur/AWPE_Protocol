@@ -3,11 +3,13 @@
 # Author: lsalas
 ###############################################################################
 
-library(plyr)
+library(plyr);library(ggplot2)
 pth<-"//prbo.org/Data/Home/Petaluma/lsalas/Documents/lsalas/IandMR8/AWPE/results/"
 
+## LABELS!!
+
 ################
-# get the empirical
+# get the empirical estimates of confidence intervals
 getFvisitsData<-function(pattern,pth){
 	fls<-list.files(pth,pattern=pattern)
 	Fvisit<-data.frame()
@@ -63,9 +65,12 @@ empiricaldf<-ldply(.data=c("1visit","2visit","3visit"),.fun=getFvisitsData,pth=p
 empiricaldf<-subset(empiricaldf,years!="YNA")
 empiricaldf$scenario<-paste0(empiricaldf$years,empiricaldf$sites,empiricaldf$Nrep,empiricaldf$Nsample,empiricaldf$Fsample,empiricaldf$weeks)
 empiricaldf<-empiricaldf[,c("years","sites","Nrep","weeks","Nsample","Fsample","scenario","prob05","prob95")]
-empiricaldf$coverage<-empiricaldf$prob95-empiricaldf$prob05
+names(empiricaldf)<-gsub("prob","emp_prob",names(empiricaldf))
+empiricaldf$coverage<-empiricaldf$emp_prob95-empiricaldf$emp_prob05
+
+
 #################
-#compile the theoretical
+#calculate the theoretical estimates of confidence intervals
 respth<-"//prbo.org/Data/Home/Petaluma/lsalas/Documents/lsalas/IandMR8/AWPE/results/"
 fls<-list.files(respth,pattern="AWPE")
 theoreticaldf<-data.frame()
@@ -111,46 +116,50 @@ theoreticaldf$scenario<-unlist(scenvals)
 theoreticaldf<-subset(theoreticaldf,Parameter=="EstR")
 theoreticaldf<-subset(theoreticaldf,Scenario!="AWPE_T6T2years1visits2weeks18sites")
 theoreticaldf<-theoreticaldf[,c("scenario","Lower05","Upper95")]
-names(theoreticaldf)<-c("scenario","thprob05","thprob95")
-theoreticaldf$thcoverage<-theoreticaldf$thprob95-theoreticaldf$thprob05
+names(theoreticaldf)<-c("scenario","the_prob05","the_prob95")
+theoreticaldf$thcoverage<-theoreticaldf$the_prob95-theoreticaldf$the_prob05
 #######################
+
+## Both tables should be of the same size...
 nrow(empiricaldf)==nrow(theoreticaldf)
+
+## Merging and calculating disparities
 sedf<-merge(empiricaldf,theoreticaldf,by="scenario")
+sedf$mismatch<-sedf$the_prob05-sedf$emp_prob05
 
-sedf$mismatch<-sedf$thprob05-sedf$prob05
-
-library(ggplot2)
-plotdf<-sedf[,c("scenario","prob05","prob95","Nsample","Fsample","Nrep","coverage","mismatch")]
+#Prepare to plot these
+plotdf<-sedf[,c("scenario","emp_prob05","emp_prob95","Nsample","Fsample","Nrep","coverage","mismatch")]
 plotdf$IntervalType<-"Empirical"
-tdf<-sedf[,c("scenario","thprob05","thprob95","Nsample","Fsample","Nrep","thcoverage","mismatch")]
-tdf$IntervalType<-"Normality"
+tdf<-sedf[,c("scenario","the_prob05","the_prob95","Nsample","Fsample","Nrep","thcoverage","mismatch")]
+tdf$IntervalType<-"Theoretical"
 names(tdf)<-names(plotdf)
 plotdf<-rbind(plotdf,tdf)
+names(plotdf)<-gsub("emp_prob","prob",names(plotdf))
 plotdf$Nrep<-as.integer(substr(plotdf$Nrep,2,4))
 
-#when num replicates is low, confint is large, and empirical is lower than theoretical
-p<-ggplot(plotdf,aes(x=scenario,ymin=prob05,ymax=prob95)) + geom_errorbar(aes(color=IntervalType),position="dodge") + coord_flip() + facet_wrap(~Fsample,ncol=3,scales="free")
+####################################
+## 
+## Visual 1
+# When num replicates is low, confidence interval is large, and empirical interval is larger than theoretical
+pt1<-ggplot(plotdf,aes(x=scenario,ymin=prob05,ymax=prob95)) + geom_errorbar(aes(color=IntervalType),position="dodge") + coord_flip() + facet_wrap(~Fsample,ncol=3,scales="free")
 
-#compare coverage vs nrep
-p<-ggplot(plotdf,aes(x=Nrep,y=coverage)) + geom_point(aes(color=IntervalType)) + facet_grid(Fsample~Nsample)
-p<-ggplot(plotdf,aes(x=Nrep,y=coverage)) + geom_point() 
+## Visual 2
+# Compare coverage (span of inner 95th percentile of values) vs number of samples (i.e., numYears * numSites) - note lower values (i.e., bias) in theoretical estimates at lower sample sizes
+pt2a<-ggplot(plotdf,aes(x=Nrep,y=coverage)) + geom_point(aes(color=IntervalType)) + facet_grid(Fsample~Nsample) + labs(x="Number of samples (years x sites)", y="Coverage (span of inner 95th percentile of values)",color="Interval estimation")
 
-# compare mismatch vs nrep
-p<-ggplot(plotdf,aes(x=Nrep,y=mismatch)) + geom_point() + facet_grid(Fsample~Nsample)
-p<-ggplot(plotdf,aes(x=Nrep,y=mismatch)) + geom_point() 
-
-# plot of ratio of coverage
+# Bias is evident if plotted as ratio of coverage: empirical/theoretical
 pdf<-sedf[,c("scenario","Nrep","thcoverage","coverage","Nsample","Fsample")]
 pdf$coverage_ratio<-pdf$coverage/pdf$thcoverage
 pdf$Nrep<-as.integer(substr(pdf$Nrep,2,4))
 
-p<-ggplot(pdf,aes(x=Nrep,y=coverage_ratio)) + geom_point() + facet_grid(Fsample~Nsample) + geom_hline(yintercept=1)
+pt2b<-ggplot(pdf,aes(x=Nrep,y=coverage_ratio)) + geom_point() + facet_grid(Fsample~Nsample) + geom_hline(yintercept=1)
 
-
+## Visual 3
+## We model it and prove it's significant
 pdf$lgNrep<-log(pdf$Nrep)
 g<-lm(coverage_ratio~lgNrep*Nsample+lgNrep*Fsample,pdf)
 summary(g)
 pdf$predicted<-predict(g)
 
-p<-ggplot(pdf,aes(x=Nrep,y=coverage_ratio)) + geom_point() + geom_line(aes(y=predicted),color="red") + facet_grid(Fsample~Nsample) + geom_hline(yintercept=1)
+pt3<-ggplot(pdf,aes(x=Nrep,y=coverage_ratio)) + geom_point() + geom_line(aes(y=predicted),color="red") + facet_grid(Fsample~Nsample) + geom_hline(yintercept=1)
 

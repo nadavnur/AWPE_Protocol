@@ -12,7 +12,14 @@
 #dependencies
 library(yaml); library(plyr)
 
-# Run the function to get the F samples
+## samplesFromCurve: This function takes F samples from a peak value of F (provided) and a curvature
+# F is the maximum value of fecundity (at the peak of the curvature)
+# curv is the quadrature of the curve (always negative)
+# seasonStart and seasonEnd are the number of days before and after the peak defining the breeding season. 
+#   So, seasonStart is always negative, and seasonEnd always positive. (Default: -30, 30)
+# numsamples is the number of samples to take in the season: a value 1-3 (Default: 3)
+# sampInt is the minimum interval between samples. (Default: 15)
+# sdFerr is the error in estimating F in a sample, a standard deviation around the F value obtained from the curve. (Default: 0.2)
 samplesFromCurve<-function(F,curv,seasonStart=-30,seasonEnd=30,numsamples=3,sampInt=15,sdFerr=0.2){
 	if(numsamples==1){
 		sampdays<-round(runif(1,min=seasonStart,max=seasonEnd))
@@ -46,12 +53,11 @@ source(paste(classpth,"SimulationDispatchClassDefinition.R",sep=""))
 
 nboot<-1000
 
-scenarios<-c("1visit","2visits2weeks","2visits4weeks","3visits2weeks")
-#for(ss in scenarios){
-	ss="N1F2"
-	ssa="1visit"
+scenarios<-c("1visit","2visits2weeks","2visits4weeks","3visits2weeks","N1F2visits2weeks","N1F3visits2weeks","N2F1visits2weeks","N3F1visits2weeks")
+for(ss in scenarios){
 	print(ss)
-	yamlpth<-paste("C:/Users/lsalas/git/sparklemotion/AWPE/SimDefinitions/N",ssa,".yaml",sep="")
+	ssa<-ifelse(grepl("N1",ss),"1visit",ifelse(grepl("N2",ss),"2visits2weeks",ifelse(grepl("N3",ss),"3visits2weeks",ss)))
+	yamlpth<-paste("C:/Users/lsalas/git/sparklemotion/AWPE/SimulationDefinitions/N",ssa,".yaml",sep="")
 	simdefs<-yaml.load_file(yamlpth)
 	simdefnam<-simdefs$SimulationName
 		
@@ -67,8 +73,9 @@ scenarios<-c("1visit","2visits2weeks","2visits4weeks","3visits2weeks")
 	
 	##################################
 	## Now the Juveniles
-	ssj="2visits2weeks"
-	fsimdefs<-yaml.load_file(paste("C:/Users/lsalas/git/sparklemotion/AWPE/SimDefinitions/F",ssj,".yaml",sep=""))
+	#ssj="2visits2weeks"
+	ssj<-ifelse(grepl("F1",ss),"1visit",ifelse(grepl("F2",ss),"2visits2weeks",ifelse(grepl("F3",ss),"3visits2weeks",ss)))
+	fsimdefs<-yaml.load_file(paste("C:/Users/lsalas/git/sparklemotion/AWPE/SimulationDefinitions/F",ssj,".yaml",sep=""))
 	ftvars<-c("SetId","SimulationId","PopulationId","YearSampled","areaMean","TransectId","siteId","siteMean")
 	fdata<-unique(data[,ftvars])
 	fdata$trueN<-exp(fdata$siteMean)
@@ -88,7 +95,7 @@ scenarios<-c("1visit","2visits2weeks","2visits4weeks","3visits2weeks")
 	fdata<-merge(fdata,siteyears,by=c(linkflds))
 	fdata<-fdata[,c(fdn,"sampR")]
 	
-	# Calculate the true F from the sampled R, then logF
+	# Calculate the true F from the sampled R and trueN, then logF
 	fdata$trueF<-fdata$trueN*fdata$sampR
 	fdata$logF<-log(fdata$trueF)
 	linkvars<-c("SetId","SimulationId","PopulationId","YearSampled","TransectId","siteId","logF")
@@ -124,58 +131,10 @@ scenarios<-c("1visit","2visits2weeks","2visits4weeks","3visits2weeks")
 	###########################################
 	#save
 	filepth<-"//prbo.org/Data/Home/Petaluma/lsalas/Documents/lsalas/IandMR8/AWPE/simulations/"
-	#save(data,fdata,Fsimdata,file=paste(filepth,nboot,"sim_",substr(simdefnam,3,nchar(simdefnam)),".RData",sep=""))
 	save(data,fdata,Fsimdata,file=paste(filepth,nboot,"sim_",ss,".RData",sep=""))
-#}
+}
 
 q(save="no")
 
 
-
-#test...
-library(ggplot2)
-ds1d<-subset(data,SetId=="AWPEsurveyDesign:AWPEtest:1" & SimulationId=="MuTrend:0")
-#it's the same mean for all areas...
-p<-ggplot(ds1d,aes(x=YearSampled,y=areaMean)) + geom_line(aes(color=AreaId))
-print(p)
-#each area gets its top mean (day 0 mean)
-p<-ggplot(ds1d,aes(x=YearSampled,y=siteMean)) + geom_line(aes(color=AreaId))
-#each area gets its sampled values - from which we'd construct curvatures
-p<-ggplot(ds1d,aes(x=YearSampled,y=siteMean)) + geom_line(aes(color=AreaId)) + geom_point(aes(y=sample,color=AreaId))
-
-
-####################
-
-
-
-library(ggplot2)
-#plot in one graph the mean of means across simulations and sites of true N, F, and R
-trueNsimsite<-aggregate(siteMean~siteId+Year,resdf,mean)
-trueFsimsite<-aggregate(logF~siteId+Year,resdf,mean)
-truesimsite<-merge(trueNsimsite,trueFsimsite,by=c("siteId","Year"))
-truesimsite$realR<-exp(truesimsite$logF)/exp(truesimsite$siteMean)
-truesiteN<-aggregate(siteMean~Year,truesimsite,mean)
-truesiteF<-aggregate(logF~Year,truesimsite,mean)
-truesiteR<-aggregate(realR~Year,truesimsite,mean)
-truesite<-merge(truesiteN,truesiteF,by="Year")
-truesite<-merge(truesite,truesiteR,by="Year")
-
-
-
-Nsimsite<-aggregate(estimateN~siteId+Year,resdf,mean)
-Fsimsite<-aggregate(estimateF~siteId+Year,resdf,mean)
-Rsimsite<-aggregate(estR~siteId+Year,resdf,mean)
-simsite<-merge(Nsimsite,Fsimsite,by=c("siteId","Year"))
-simsite<-merge(simsite,Rsimsite,by=c("siteId","Year"))
-simsite$estRb<-exp(simsite$estimateF)/exp(simsite$estimateN)
-siteN<-aggregate(estimateN~Year,simsite,mean)
-siteF<-aggregate(estimateF~Year,simsite,mean)
-siteR<-aggregate(estR~Year,simsite,mean)
-siteRb<-aggregate(estRb~Year,simsite,mean)
-aggsite<-merge(siteN,siteF,by="Year")
-aggsite<-merge(aggsite,siteR,by="Year")
-aggsite<-merge(aggsite,siteRb,by="Year")
-#plot in 18 facets the mean across simulations of true N, F, and R
-
-p<-ggplot(data=simsite,aes(x=as.integer(Year),y=exp(estimateF))) + geom_line(aes(color=siteId))
 

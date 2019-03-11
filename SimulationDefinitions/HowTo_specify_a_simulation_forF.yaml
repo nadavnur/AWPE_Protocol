@@ -1,0 +1,38 @@
+## This file describes how to specify the parameters to generate AWPE simlated data for Fecundity (F).
+
+###########################
+##						           ##
+##	EXAMPLE - NOT RUN	   ##
+##						           ##
+###########################
+
+## This file simulates: 
+##   Based on a true adult abundance by site and year (N - within each simulation), the file samples a value for F (# fledglings) from provided mean and SD for R. 
+##   (R is the ratio of F/N). This sampled value of F for each site is the "true F", and is assumed to be the peak fledgling abundance
+##    for the site and yer. Further it varies among dates within the year following a provided curvture.
+##   If the curvature is provided and the site is surveyed 3 times/year, 3 values (i.e., the value of F in three different days) are taken for each site.  
+##    That is, the true value of F is thus calculated for each site and year, for each of 3 survey dates. The curvature is fittid with a quadratic function  
+##    for which the quadrature (parameter "Cseason", always negative), and breeding season start and end dates provided. If only 1 survey is taken each year, then the curvature is not used.
+##   To initialize the simulation, each site is assigned its own R value (reproductive success - sampled from mean and SD for R). This random assignment of R values happens
+##    only once at the beginning and is kept truoughout the bootstraps so as to force the simulations of each survey location to always start at the same values of F, R and N
+##   The stochasticity in the model is generated at the survey site level: a sample is taken from each site (based on its simulated mean and provided sampling error
+##    (parameter SigSample) to add survey error to the simulation.
+
+ProjectId: AWPEsurveyDesign
+SimulationName: F_1visit #A code to identify this data simulation definition
+DefinitionAuthor: Nadav Nur
+NsurveyDesignFile: AWPE/N3visits2weeks.yaml
+R_SamplingDist: Gaussian #valid: Gaussian, Poisson, NegBin
+Rmu: 0.48
+Rsd: 0.12
+FixSiteEffects: FALSE #If TRUE the site R means are set at year 0 and kept, relative to area R, constant throughout the yearspan. If false, then the site R means are sampled every year.
+Populations:        #can specify as many as desired, assuming each specification is different from all others in terms of season span, curvature, num replicates, replicate span, and/or sampling error
+   -
+      PopulationId: F_Pop1  #[SimulationId:PopulationId]
+      Cseason: -0.0010944  #The seasonal curvature parameter for survey sites in this population - make 0 for no curvature, otherwise a very small value, usually < 0.001
+      SeasonStart: -26 #The first day to define the survey period. Day 0 is where density is at its maximum value in the curvature
+      SeasonEnd: 28    #The last day of the season.
+      MaxReplicates: 1 #the maximum number of replicates each year at each site - so the number of replicates is runif[1,MinReplicates,MaxReplicates].
+      ReplicateSpan: 1  #The number of days between replicates. WARNING: MaxReplicates*ReplicateSpan < SeasonEnd-SeasonStart+2 
+      ProbDetection: 1 #A value between 0-1 indicating a probability of detecting the species. If 1, this is ignored. Else, pDet is sampled from the binomial dist with this mu.
+      SigSample: 0.3515  #The StDev of sampling error, or variance among samples, but if SamplingDist is NegBin, this is k, such that Sig = mu +k*mu^2  [A: 0.3515  B: 0.2313]

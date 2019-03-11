@@ -1,10 +1,4 @@
-## This file simulates: 
-##   Based on a true adult abundance by site and year (within each simulation), the file samples a value for R (ratio of fledglings per adult) from provided mean and SD. 
-##   So, each site gets its own R value that varies by year. From this, the true F (# fledglings) per site and year.
-##   This true F is assumed to be the peak fledgling abundance for the site and yer, and it varies among dates within the year following a provided curvture
-##   With the curvature, 3 values (i.e., the value of F in three different days) are taken for each site. That is, he true value of F is thus calculated for each site and year, for each of 3 survey dates.
-##   Finally, a sample is taken from each of these to add survey error to the simulation.
-ProjectId: AWPEsurveyDesign
+## See HowTo_specify_a_simulation_forF.yaml for detailsProjectId: AWPEsurveyDesign
 SimulationName: F_2visits_4weeks #A code to identify this data simulation definition
 DefinitionAuthor: Nadav Nur
 NsurveyDesignFile: AWPE/N2visits4weeks.yaml
