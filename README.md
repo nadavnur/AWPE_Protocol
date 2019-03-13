@@ -2,7 +2,7 @@
 
 The simulations intend to resemble the outcome of field surveys of AWPE by various means. These surveys  
 estimate the number of adults (N) and ratio of chicks to adults (R). Thus, we simulate N and we simulate fecundity  
-(the number of chicks per adult - F), from which we calculate R.
+(the number of chicks per adult - F), from which we calculate a simulated R.
 
 The simulations use a set of R objects we constructed for general purposes of power analysis simulations. We are  
 not including the code for those objects here because the license for this repository does not meet the requirements  
