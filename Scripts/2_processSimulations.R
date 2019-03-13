@@ -23,8 +23,17 @@
 # each simulation, and then summarized across simulations by obtaining means, standard errors, and 
 # confidence intervals.
 
+## Dependencies
 library(yaml);library(plyr)
 
+
+## Functions we will need
+
+# getEstimateR: estimates R from a simulation
+# dfN is the set of values of N from a simulation set
+# dfF is the set of values of F from a simulation set
+# trJuvVisits is the number of surveys conducted where juveniles/chicks were counted
+# trAdVisits is the number of surveys conducted where adults were counted
 getEstimateR<-function(dfN,dfF,trJuvVisits,trAdVisits){
 	dfN$Year<-as.character(dfN$YearSampled)
 	if(trAdVisits>1){		#trAdVisits==3
@@ -59,6 +68,13 @@ getEstimateR<-function(dfN,dfF,trJuvVisits,trAdVisits){
 	return(estdata)
 }
 
+# validateInputs: validates the inputs of an analysis definition .yaml file against the data
+# trSites is the number of sites surveyed in a simulation
+# trYears is the number of years surveyed in a simulation
+# trVisitsJv is the number of surveys conducted where juveniles/chicks were counted
+# trVisitsAd is the number of surveys conducted where adults were counted
+# data is the simulated data for adult surveys
+# Fsimdata is the simulated data for juvenile/chick surveys
 validateInputs<-function(trSites,trYears,trVisitsJv,trVisitsAd,data,Fsimdata){	#
 	report<-""
 	if(!trYears %in% c(2,3,5,6)){
@@ -77,6 +93,9 @@ validateInputs<-function(trSites,trYears,trVisitsJv,trVisitsAd,data,Fsimdata){	#
 	return(report)
 }
 
+# validateTotalSites validates the total number of sites surveyd for juveniles in the simulation data
+# tsites is the expected total number of sites
+# Fsimdata is the simulated data for juvenile/chick surveys 
 validateTotalSites<-function(tsites,Fsimdata){
 	report<-""
 	if(NROW(unique(Fsimdata$siteId))<tsites){
@@ -85,6 +104,11 @@ validateTotalSites<-function(tsites,Fsimdata){
 	return(report)
 }
 
+# getResdf is a wrapper function that calls getEstimateR
+# Ndf is the set of values of N from a simulation set
+# Fdf is the set of values of F from a simulation set
+# trJuvVisits is the number of surveys conducted where juveniles/chicks were counted
+# trAdVisits is the number of surveys conducted where adults were counted
 getResdf<-function(Ndf,Fdf,trJuvVisits,trAdVisits){
 	resdf<-data.frame()
 	for(ii in unique(Ndf$SetId)){
@@ -98,6 +122,10 @@ getResdf<-function(Ndf,Fdf,trJuvVisits,trAdVisits){
 	return(resdf)
 }
 
+# getMeansQuants calculates the mean and standard deviation of results for the "var" parameter by site
+# srdf is the simulated data to be summarized into mean and confidence interval values for each site
+# var is the name of the variable to summarize
+# snyrs is an auxiliary table with metadata on years surveyed
 getMeansQuants<-function(srdf,var,snyrs){
 	fml<-paste(var,"~siteId+TransectId",sep="");mvn<-paste("mean_",var,sep="");svn<-paste("SD_",var,sep="")
 	evn<-paste("SE_",var,sep="");lvn<-paste("Lower05_",var,sep="");uvn<-paste("Upper05_",var,sep="")
@@ -112,6 +140,9 @@ getMeansQuants<-function(srdf,var,snyrs){
 	return(tdf)
 }
 
+# calculateEstsBySite calculates N and R for each site in the data
+# srdf is the data to use for the calculations
+# scenario is a variable passing the name of the analysis scenario being processed
 calculateEstsBySite<-function(srdf,scenario){
 	snyrs<-aggregate(Year~siteId+TransectId,srdf,FUN=function(x){y<-NROW(unique(x));return(y)});names(snyrs)<-c("siteId","TransectId","NumYears")
 	smnN<-aggregate(estimateN~siteId+TransectId,srdf,mean);names(smnN)<-c("siteId","TransectId","lgmean_estN")
@@ -133,6 +164,9 @@ calculateEstsBySite<-function(srdf,scenario){
 	return(bysitedf)
 }
 
+# calculateEstsOverall summarizes results for the entire set of sites
+# bysitedf is the file with estimates by site
+# scenario is a variable passing the name of the analysis scenario being processed
 calculateEstsOverall<-function(bysitedf,scenario){
 	odf<-bysitedf[,c("mean_estR","mean_diffR","mean_absDiffR","mean_estN","SE_estR","SE_diffR","SE_absDiffR")]
 	odf$wmeR<-odf$mean_estR*sqrt(odf$mean_estN);odf$wdiR<-odf$mean_diffR*sqrt(odf$mean_estN);odf$wabR<-odf$mean_absDiffR*sqrt(odf$mean_estN)
@@ -157,6 +191,10 @@ calculateEstsOverall<-function(bysitedf,scenario){
 	return(wom)
 }
 
+# calculateStats is a wrapper function for calculateEstsBySite
+# srdf is the data to use for the calculations
+# scenario is a variable passing the name of the analysis scenario being processed
+# single site is a flag indicating if statistics should be calculated for a single site or overall
 calculateStats<-function(srdf,scenario,singlesite=FALSE){
 	reslst<-list()
 	
@@ -175,15 +213,19 @@ calculateStats<-function(srdf,scenario,singlesite=FALSE){
 	return(reslst)
 }
 
+
+## Inputs:
 defyamlpth<-"C:/Users/lsalas/git/sparklemotion/AWPE/AnalysisDefinitions/"
 anaDefs<-list.files(defyamlpth,pattern="6Y")
 
+
+## Run the analyses by analysis definition...
 for(adf in anaDefs){
+	#read the analysis definition
 	andefs<-try(yaml.load_file(paste(defyamlpth,adf,sep="")),silent=FALSE)
 	sfpth<-andefs$SimulationsFile
 	print(sfpth)
 	load(sfpth)	#loads data, Fsimdata
-#data<-subset(data,YearSampled>0);Fsimdata<-subset(Fsimdata,YearSampled>0)
 	
 	nsites<-c(4,10,18)
 	nyears<-c(2,3,5,6)
