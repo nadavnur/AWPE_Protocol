@@ -10,8 +10,8 @@ for us to publish these objects. In this repository we include the following:
 1. The complete logic of our approach, including the code that uses the power analysis objects
 2. The simulation definition files (.yaml files in the SimulationDefinitions folder) that specify what to simulate and how
 3. The resulting synthetic data from a run of 1,000 simulations (.RData files in the SimulationData folder)
-4. The code scripts that process these synthetic data and generates the results (see 3_compileResults.R) used in the Stata  
-analyses and presented in the report (see "To run simulations, extract results and summarize" below)
+4. The code scripts that process these synthetic data and generates the results (see 3_compileResults.R) used in  
+the Stata analyses and presented in the report (see "To run simulations, extract results and summarize" below)
 5. An additional script file that shows justifications for some of our decisions (visualizeR_seR.R)
 
 ## To run simulations, extract results, and summarize
@@ -31,7 +31,8 @@ a comma-separated file as output.
 
 ### About this work
 
-The simulations and calculations were developed by Nadav Nur and Leo Salas, Point Blue Conservation Science, per contract with  
-the U.S. Fish and Wildlife Service, Region 8, on behalf of the American White Pelican Reproductive Success Protocol project team. 
+The simulations and calculations were developed by Nadav Nur and Leo Salas, Point Blue Conservation Science, per contract  
+with the U.S. Fish and Wildlife Service, Region 8, on behalf of the American White Pelican Reproductive Success Protocol  
+project team. 
   
 For any further inquiries, contact Dr. Nadav Nur at nnur@pointblue.org
