@@ -10,22 +10,23 @@ for us to publish these objects. In this repository we include the following:
 1. The complete logic of our approach, including the code that uses the power analysis objects
 2. The simulation definition files (.yaml files in the SimulationDefinitions folder) that specify what to simulate and how
 3. The resulting synthetic data from a run of 1,000 simulations (.RData files in the SimulationData folder)
-4. The code scripts that process these synthetic data and generate the results used in the Stata analyses and presented in the report
+4. The code scripts that process these synthetic data and generates the results (see 3_compileResults.R) used in the Stata  
+analyses and presented in the report (see "To run simulations, extract results and summarize" below)
 5. An additional script file that shows justifications for some of our decisions (visualizeR_seR.R)
 
 ## To run simulations, extract results, and summarize
 
 The script 1_runSurveySimulations.R contains all the code to run simulations. It sources the power analysis objects and  
-then processes the simulation scenarios specified therein. Note that the names of these scenarios refer to names of .yaml  
-files in the SimulationDefinitions folder. Refer to the How_To file in that folder to understand how these simulations  
-are defined in each of the .yaml files.
+then processes the simulation scenarios specified in the yaml files found in the SimulationDefinitions folder. Note that  
+the names of these scenarios refer to names of the .yaml files. Refer to the How_To file in the SimulationDefinitions folder  
+to understand how these simulations are defined in each of the .yaml files.
 
-Once the simulations complete, results are extracted with the script 2_processSimulations.R. This script uses the  
+Once the simulations are completed, results are extracted with the script 2_processSimulations.R. This script uses the  
 instructions in the .yaml files in the folder AnalysisDefinitions to understand what information to extract from the  
 simulated data. The user is welcomed to try running this code with the simulation data in the SimulationData folder.  
 Just make sure to adjust the paths to files as needed.
 
-Once the results are extracted, these are summarized by the script compileResults.R, and exported to Stata using  
+Once the results are extracted, these are summarized by the script 3_compileResults.R, and exported to Stata using  
 a comma-separated file as output. 
 
 ### About this work
