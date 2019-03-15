@@ -6,7 +6,7 @@
 ##						           ##
 ###########################
 
-## This file simulates: 
+## This file simulates the following: 
 ##   Based on a true adult abundance by site and year (N - within each simulation), the file samples a value for F (# fledglings) from provided mean and SD for R. 
 ##   (R is the ratio of F/N). This sampled value of F for each site is the "true F", and is assumed to be the peak fledgling abundance
 ##    for the site and yer. Further it varies among dates within the year following a provided curvture.
