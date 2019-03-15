@@ -28,5 +28,9 @@ Just make sure to adjust the paths to files as needed.
 Once the results are extracted, these are summarized by the script compileResults.R, and exported to Stata using  
 a comma-separated file as output. 
 
-[Best to read this file by copying its content in a Markdown editor, for example: https://dillinger.io/]
+### About this work
 
+The simulations and calculations were developed by Nadav Nur, Point Blue Conservation Science, for the  
+U.S. Fish and Wildlife Service, Region 8. 
+  
+For any further inquiries, contact Dr. Nadav Nur at nnur@pointblue.org
