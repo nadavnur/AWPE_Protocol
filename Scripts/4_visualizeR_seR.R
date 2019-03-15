@@ -6,8 +6,6 @@
 library(plyr);library(ggplot2)
 pth<-"//prbo.org/Data/Home/Petaluma/lsalas/Documents/lsalas/IandMR8/AWPE/results/"
 
-## LABELS!!
-
 ################
 # get the empirical estimates of confidence intervals
 getFvisitsData<-function(pattern,pth){
