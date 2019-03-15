@@ -30,7 +30,7 @@ a comma-separated file as output.
 
 ### About this work
 
-The simulations and calculations were developed by Nadav Nur and Leo Salas, Point Blue Conservation Science, per contract with the   
-U.S. Fish and Wildlife Service, Region 8, on behalf of the American White Pelican Reproductive Success Protocol project team. 
+The simulations and calculations were developed by Nadav Nur and Leo Salas, Point Blue Conservation Science, per contract with  
+the U.S. Fish and Wildlife Service, Region 8, on behalf of the American White Pelican Reproductive Success Protocol project team. 
   
 For any further inquiries, contact Dr. Nadav Nur at nnur@pointblue.org
