@@ -6,7 +6,7 @@ estimate the number of adults (N) and ratio of chicks to adults (R). Thus, we si
 
 The simulations use a set of R objects we constructed for general purposes of power analysis simulations. We are  
 not including the code for those objects here because the license for this repository does not meet the requirements  
-for us to publish these objects. However, we are including here:
+for us to publish these objects. In this repository we include:
 1. The complete logic of our approach, including the code that uses the power analysis objects
 2. The simulation definition files (.yaml files in the SimulationDefinitions folder) that specify what to simulate and how
 3. The resulting synthetic data from a run of 1,000 simulations (.RData files in the SimulationData folder)
